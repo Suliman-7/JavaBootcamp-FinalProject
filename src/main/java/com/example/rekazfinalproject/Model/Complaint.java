@@ -16,6 +16,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+    //*** All Done by shahad ****
 public class Complaint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +46,6 @@ public class Complaint {
     private String priority_level;
 
     @Column(name = "status", length = 13, nullable = false)
-    @NotEmpty(message = "Status cannot be empty")
     @Enumerated(EnumType.STRING)
     private ComplaintStatus status;
 
