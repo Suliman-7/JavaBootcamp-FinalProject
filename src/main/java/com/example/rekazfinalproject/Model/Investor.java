@@ -39,6 +39,10 @@ public class Investor {
     @Column(columnDefinition = "varchar(100) not null")
     private String investorSectors;
 
+    
+    @Column(columnDefinition = "double")
+    private double rate ;
+
     @PastOrPresent(message = "Creation date must be in the past or today")
     private LocalDate createdAt;
 
