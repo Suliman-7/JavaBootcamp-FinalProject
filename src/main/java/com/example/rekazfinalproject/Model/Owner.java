@@ -42,6 +42,9 @@ public class Owner {
 
     private double discountPercentage = 0 ;
 
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
+    private Set<Complaint> complaints;
+
     @OneToMany(cascade = CascadeType.ALL , mappedBy = "owner")
     private Set<Project> projects;
 
@@ -51,6 +54,15 @@ public class Owner {
     @JsonIgnore
     private User user;
 
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
+    private Set<Consultation> consultations;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
+    private Set<Property> properties;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
+    private Set<Rating> ratings;
 //    @OneToMany(cascade = CascadeType.ALL , mappedBy = "owner")
 //    private Set<Project> projects;
 
