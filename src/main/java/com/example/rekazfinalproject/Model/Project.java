@@ -46,8 +46,8 @@ public class Project {
     private String projectType;
 
     @Column(columnDefinition = "datetime")
-    private LocalDate creationDate;
-
+    private LocalDate publication_date;
+    
     @Column(columnDefinition = "datetime")
     private LocalDate deadline;
 
@@ -78,8 +78,12 @@ public class Project {
     @JsonIgnoreProperties("project")
     private List<Report> reports;
 
+    @OneToOne(cascade = CascadeType.ALL , mappedBy = "project")
+    @PrimaryKeyJoinColumn
+    private Property property;
 
     public enum ProjectStatus {
+           PENDING,
         IN_PROGRESS,
         COMPLETED
     }
