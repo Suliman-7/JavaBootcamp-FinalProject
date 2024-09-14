@@ -90,5 +90,9 @@ public class InvestorController {
         investorService.investorAddQuestion(investorId,question);
         return ResponseEntity.status(200).body("Question added successfully");
     }
+     @GetMapping("/get-investor-by-owner/{owner}")
+    public ResponseEntity lisInvestorCompanyByOwner(@PathVariable Integer owner){
+        return ResponseEntity.status(200).body(investorService.listInvestorCompanyByOwner(owner));
+    }
 
 }
