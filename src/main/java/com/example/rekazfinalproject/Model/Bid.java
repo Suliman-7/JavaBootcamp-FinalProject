@@ -39,6 +39,11 @@ public class Bid {
     @Enumerated(EnumType.STRING)
     private BidStatus status;
 
+        
+    @Column(columnDefinition = "varchar(500)")
+    private String comment ;
+
+    
     @ManyToOne
     @JsonIgnore
     private Project project ;
