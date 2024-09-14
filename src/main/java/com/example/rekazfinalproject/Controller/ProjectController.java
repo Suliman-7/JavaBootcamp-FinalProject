@@ -75,4 +75,9 @@ public class ProjectController {
     public ResponseEntity getByDate(@PathVariable LocalDate startDate, @PathVariable LocalDate endDate) {
         return ResponseEntity.status(200).body(projectService.getProjectByDate(startDate, endDate));
     }
+     @GetMapping("/get-projects-by-budget/{investorId}/{maxBudget}")
+    public ResponseEntity getProjectsByBudget(@PathVariable Integer investorId,@PathVariable double maxBudget ) {
+        return ResponseEntity.status(200).body(projectService.getProjectsByBudget(investorId,maxBudget));
+    }
+
 }
