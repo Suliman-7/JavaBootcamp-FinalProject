@@ -51,11 +51,11 @@ public class ContractService {
         if(ownerUser.isActive()==false){
             throw new ApiException("owner is not active");
         }
-//        Bid bid=bidRepository.findBidById(projectId);
+
         Bid bid = new Bid();
 
-        for(Bid bid1 : bidRepository.findAll()){
-            if(bid1.getProject()==project){
+        for(Bid bid1 : investor.getBids()){
+            if(bid1.getProject()==project ){
                 bid=bid1 ;
             }
         }
@@ -144,6 +144,16 @@ public class ContractService {
             throw new ApiException("Contract has been Expired");
         }
 
+        Project project = contract.getProject();
+
+
+        for(Bid bid1 : project.getBid()){
+            if( bid1.getStatus().equals(Bid.BidStatus.APPROVED) ){
+                bid1.setStatus(Bid.BidStatus.REJECTED); ;
+            }
+        }
+        
+        
         contract.setStatus(Contract.ContractStatus.EXPIRED);
 //        contract.setRejectionDate(LocalDate.now()); // Record the rejection date if needed
         contractRepository.save(contract);
