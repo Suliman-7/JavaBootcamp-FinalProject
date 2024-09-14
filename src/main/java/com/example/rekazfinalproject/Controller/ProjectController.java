@@ -53,4 +53,26 @@ public class ProjectController {
         List<Project> projects = projectService.findByProjectType(projectType);
         return ResponseEntity.status(200).body(projects);
     }
+
+    // Suliman
+        @GetMapping("/get-closest-projects")
+    public ResponseEntity getClosestProject() {
+        return ResponseEntity.status(200).body(projectService.getClosestProjects());
+    }
+
+        // Suliman
+
+    
+    @GetMapping("/get-highest-projects")
+    public ResponseEntity getHighestProject() {
+        return ResponseEntity.status(200).body(projectService.getHighestProjectsBudget());
+    }
+
+        // Suliman
+
+    
+    @GetMapping("/get-by-date/{startDate}/{endDate}")
+    public ResponseEntity getByDate(@PathVariable LocalDate startDate, @PathVariable LocalDate endDate) {
+        return ResponseEntity.status(200).body(projectService.getProjectByDate(startDate, endDate));
+    }
 }
