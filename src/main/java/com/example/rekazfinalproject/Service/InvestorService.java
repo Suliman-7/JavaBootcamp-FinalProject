@@ -104,6 +104,8 @@ public class InvestorService {
             throw new ApiException("This project has an approved bid.");
         }
 
+        bid.setStatus(Bid.BidStatus.PENDING);
+
         bid.setInvestor(investor);
 
         bid.setProject(project);
@@ -114,12 +116,17 @@ public class InvestorService {
 
     // Investor edit his bid , made by suliman
 
-    public void editBid ( Integer investorId , Integer id , Bid bid) {
+    public void editBid ( int investorId , int id , Bid bid) {
 
         Investor investor = investorRepository.findInvestorById(investorId);
 
         if(investor==null){
             throw new ApiException("Investor not found");
+        }
+
+        User investorUser = userRepository.findUserById(investorId);
+        if(investorUser.isActive()==false){
+            throw new ApiException("investor is not active");
         }
 
 
@@ -128,6 +135,8 @@ public class InvestorService {
         if(bid1==null){
             throw new ApiException("Bid not found");
         }
+
+
 
         if(bid1.getStatus()== Bid.BidStatus.APPROVED){
             throw new ApiException("Approved Bid cannot be edited");
@@ -140,8 +149,84 @@ public class InvestorService {
         bid1.setBudget(bid.getBudget());
         bid1.setDeadline(bid.getDeadline());
         bid1.setDescription(bid.getDescription());
+        bid1.setStatus(Bid.BidStatus.PENDING);
+        bid1.setComment("");
 
         bidRepository.save(bid1);
+    }
+
+    // Suliman
+
+    public List<Project> getMyProjects(int investorId) {
+        List<Project> myProjects = new ArrayList<>();
+        Investor investor = investorRepository.findInvestorById(investorId);
+        if (investor == null) {
+            throw new ApiException("Investor not found");
+        }
+        for(Project project : projectRepository.findAll()){
+            if (project.getInvestor().equals(investor)) {
+                myProjects.add(project);
+            }
+        }
+        if (myProjects.size() == 0) {
+            throw new ApiException("Investor doesn't have any projects");
+        }
+        return myProjects;
+    }
+
+    // Suliman
+
+    public List<Project> getOwnerProject(int ownerId){
+        List<Project> ownerProjects = new ArrayList<>();
+        Owner owner = ownerRepository.findOwnerById(ownerId);
+        if(owner==null){
+            throw new ApiException("Owner not found");
+        }
+        for(Project project : projectRepository.findAll()){
+            if(project.getOwner().equals(owner)){
+                ownerProjects.add(project);
+            }
+        }
+        if (ownerProjects.size() == 0) {
+            throw new ApiException("Owner doesn't have any projects");
+        }
+        return ownerProjects;
+    }
+
+
+    // Suliman
+
+    public List<Investor> showHighestInvestorsRate() {
+
+
+        List<Investor> highestRev = investorRepository.findAll();
+
+        for (int i = 0; i < highestRev.size() - 1; i++) {
+            for (int j = 0; j < highestRev.size() - i - 1; j++) {
+                if (highestRev.get(j).getRate() < highestRev.get(j + 1).getRate()) {
+
+                    Investor highest = highestRev.get(j);
+                    highestRev.set(j, highestRev.get(j + 1));
+                    highestRev.set(j + 1, highest);
+                }
+            }
+        }
+
+        return highestRev;
+
+    }
+
+    // Suliman
+
+    public void investorAddQuestion(Integer investorId,String question)
+    {
+        if(investorRepository.findInvestorById(investorId) == null)
+        {
+            throw new ApiException("Investor not found");
+        }
+
+        Question question1 = new Question(null,question,null,investorRepository.findInvestorById(investorId),null);
+        questionRepository.save(question1);
     }
 
 }
