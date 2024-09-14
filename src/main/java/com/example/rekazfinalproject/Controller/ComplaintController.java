@@ -13,16 +13,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/complaint")
 public class ComplaintController {
     private final ComplaintService complaintService;
-    @GetMapping("/get")
+     @GetMapping("/get")
     public ResponseEntity getAllComplaint(){
         return ResponseEntity.status(200).body(complaintService.getAllComplaint());
     }
 
-    @PostMapping("/add")
-    public ResponseEntity addComplaint(@Valid @RequestBody Complaint complaint){
-        complaintService.addNewComplaint(complaint);
-        return ResponseEntity.status(200).body(new ApiResponse("Complaint successfully added"));
+    @PostMapping("/send-complaint/investor-id/{investorId}")
+    public ResponseEntity investorAddComplaint(@PathVariable Integer investorId,@Valid @RequestBody Complaint complaint){
+        complaintService.investorSendComplaint(investorId,complaint);
+        return ResponseEntity.status(200).body(new ApiResponse("Complaint successfully send"));
     }
+@PostMapping("/send-complaint/owner-id/{owner}")
+public ResponseEntity ownerAddComplaint(@PathVariable Integer owner, @Valid @RequestBody Complaint complaint) {
+    complaintService.ownerSendComplaint(owner, complaint);
+    return ResponseEntity.status(200).body(new ApiResponse("Complaint successfully send"));
+}
 
     @PutMapping("/update/{id}")
     public ResponseEntity updateComplaint (@PathVariable Integer id , @Valid @RequestBody Complaint complaint){
@@ -34,5 +39,15 @@ public class ComplaintController {
     public ResponseEntity deleteComplaint(@PathVariable Integer id){
         complaintService.deleteComplaint(id);
         return ResponseEntity.status(200).body(new ApiResponse("Complaint successfully deleted"));
+    }
+    @PutMapping("/update-complaint-to-inprogress/{admin}/{complaint}")
+    public ResponseEntity startProcessingComplaint (@PathVariable Integer admin ,@PathVariable Integer complaint ){
+        complaintService.startProcessingComplaint(admin,complaint);
+        return ResponseEntity.status(200).body(new ApiResponse("Complaint successfully updated"));
+    }
+    @PutMapping("/update-complaint-to-resolved/{admin}/{complaint}")
+    public ResponseEntity resolveComplaint (@PathVariable Integer admin ,@PathVariable Integer complaint ){
+        complaintService.resolveComplaint(admin,complaint);
+        return ResponseEntity.status(200).body(new ApiResponse("Complaint successfully updated"));
     }
 }
