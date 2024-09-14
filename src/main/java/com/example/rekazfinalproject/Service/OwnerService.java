@@ -150,7 +150,7 @@ public class OwnerService {
 
     // Suliman
 
-    public void rejectBid( Integer ownerId , int bidId){
+    public void rejectBid( int ownerId , int bidId , String comment ){
         Owner owner = ownerRepository.findOwnerById(ownerId);
         if (owner == null) {
             throw new ApiException("Owner not found");
@@ -165,6 +165,8 @@ public class OwnerService {
         if(!bid.getProject().getOwner().equals(owner)){
             throw new ApiException("this bid belong to another owner");
         }
+
+
         if (bid.getStatus() == Bid.BidStatus.APPROVED) {
             throw new ApiException("Approved bid can't be rejected");
         }
@@ -172,9 +174,27 @@ public class OwnerService {
             throw new ApiException("Bid is already rejected");
         }
 
+        // if(comment==null){
+        //     bid.setComment("no comment from the owner");
+        // }
+        
         bid.setStatus(Bid.BidStatus.REJECTED);
+        bid.setComment(comment);
 
         bidRepository.save(bid);
+    }
+
+
+    // Suliman 
+        public void ownerAddQuestion(Integer ownerId,String question)
+    {
+        if(ownerRepository.findOwnerById(ownerId) == null)
+        {
+            throw new ApiException("Owner not found");
+        }
+
+        Question question1 = new Question(null,question,null,null,ownerRepository.findOwnerById(ownerId));
+        questionRepository.save(question1);
     }
 
 }
