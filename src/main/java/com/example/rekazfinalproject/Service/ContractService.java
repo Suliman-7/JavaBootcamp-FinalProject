@@ -121,7 +121,8 @@ public class ContractService {
         }
 
         contract.setStatus(Contract.ContractStatus.VALID);
-
+  Project project = projectRepository.findProjectById(contract.getProject().getId());
+        project.setStatus(Project.ProjectStatus.COMPLETED);
 //        contract.setApprovalDate(LocalDate.now()); // Record the approval date
         contractRepository.save(contract);
     }
