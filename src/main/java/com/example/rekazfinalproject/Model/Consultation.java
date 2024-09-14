@@ -25,11 +25,11 @@ public class Consultation {
     private Integer id;
 
     @NotNull(message = "Consultation date should not be Empty!")
-    @JsonFormat(pattern= "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     @FutureOrPresent
     @Column(columnDefinition = "datetime not null")
-    private LocalDate consultationDate;
-
+    private LocalDateTime consultationDate;
+    
     @NotNull(message = "Duration should not be null!")
     @Column(columnDefinition = "DOUBLE not null")
     private double duration;
