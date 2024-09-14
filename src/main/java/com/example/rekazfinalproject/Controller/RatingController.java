@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class RatingController {
     private final RatingService ratingService;
-    @GetMapping("/get")
+  @GetMapping("/get")
     public ResponseEntity getAllRating(){
         return ResponseEntity.status(200).body(ratingService.getAllRating());
     }
 
-    @PostMapping("/add")
-    public ResponseEntity addRating(@Valid @RequestBody Rating rating){
-        ratingService.addNewRating(rating);
+    @PostMapping("/add/{ownerId}/{investorId}")
+    public ResponseEntity addRating(@PathVariable Integer ownerId,@PathVariable Integer investorId,@Valid @RequestBody Rating rating){
+        ratingService.addNewRating(ownerId,investorId,rating);
         return ResponseEntity.status(200).body(new ApiResponse("Rating successfully added"));
     }
 
@@ -30,9 +30,14 @@ public class RatingController {
         return ResponseEntity.status(200).body(new ApiResponse("Rating successfully updated"));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteRating(@PathVariable Integer id){
-        ratingService.deleteRating(id);
+    @DeleteMapping("/delete/{userId}/{ratingId}")
+    public ResponseEntity deleteRating(@PathVariable Integer userId,@PathVariable Integer ratingId){
+        ratingService.deleteRating(userId,ratingId);
         return ResponseEntity.status(200).body(new ApiResponse("Rating successfully deleted"));
+    }
+    //average rating
+    @GetMapping("/get-average/{investor}")
+    public ResponseEntity getAverageRating(@PathVariable Integer investor){
+        return ResponseEntity.status(200).body(new ApiResponse("Average Rating: " +ratingService.getAverageRating(investor)));
     }
 }
