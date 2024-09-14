@@ -8,6 +8,6 @@ import java.util.List;
 public interface ContractRepository extends JpaRepository<Contract, Integer> {
 
     Contract findContractById(Integer id);
-
+ Contract findContractByOwnerIdAndInvestorId(Integer ownerId, Integer investorId);
 //    List<Contract> findAllByUserId(Integer userId);
 }
