@@ -98,6 +98,37 @@ public class UserService {
         }
     }
 
+    // Suliman
+
+        public void deleteByWord(String comment)
+    {
+        if(ratingRepository.findReviewByCommentContains(comment).isEmpty())
+        {
+            throw new ApiException("No comment found");
+        }
+        ratingRepository.deleteAll(ratingRepository.findReviewByCommentContains(comment));
+    }
+
+    // Suliman 
+    
+    public void answerQuestion(Integer adminId,Integer questionId,String answer)
+    {
+        Question question = questionRepository.findQuestionById(questionId);
+        if(question == null)
+        {
+            throw new ApiException("Question not found");
+        }
+        User adminUser = userRepository.findUserById(adminId);
+
+        if(adminUser == null)
+        {
+            throw new ApiException("Admin not found");
+        }
+
+        question.setAnswer(answer);
+        questionRepository.save(question);
+    }
+
 
 
 }
