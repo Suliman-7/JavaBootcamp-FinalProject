@@ -17,6 +17,15 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
     List<Project> findProjectByCity(String city);
 
     List<Project> findProjectByProjectType(String projectType);
-
+    
+ Project findProjectByOwnerId(Integer ownerId);
+    
+   Project findProjectByInvestorId(Integer investorId);
+    
+    @Query("SELECT p FROM Project p WHERE p.budget <= :budget and p.status='PENDING'")
+        List<Project> listProjectWithSpecvicedBudgetAndStatus(double budget);
+    
+    List<Project>findProjectsByOwnerId(Integer ownerId);
+    
 
 }
