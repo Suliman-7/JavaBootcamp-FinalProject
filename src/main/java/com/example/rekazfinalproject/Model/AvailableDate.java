@@ -27,6 +27,7 @@ public class AvailableDate {
 
     @Column(columnDefinition = "datetime not null")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+     @FutureOrPresent
     private LocalDateTime date ;
 
     @Column(columnDefinition = "boolean")
