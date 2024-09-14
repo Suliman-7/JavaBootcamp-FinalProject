@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 
 public interface AvailableDateRepository extends JpaRepository<AvailableDate, Integer> {
-
-    // AvailableDate findAvailableDateById(int id);
+     AvailableDate findAvailableDateById(int id);
+     List<AvailableDate> findAvailableDatesByInvestorId(Integer investorId);
 }
