@@ -18,6 +18,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+    //*** All Done by Shahad ****
 public class Consultation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +33,10 @@ public class Consultation {
     @NotNull(message = "Duration should not be null!")
     @Column(columnDefinition = "DOUBLE not null")
     private double duration;
+
+    //consultation fee=60;
+    @Column(columnDefinition = "DOUBLE not null")
+    private double consultationFee;
 
     @Enumerated(EnumType.STRING)
     private ConsultationStatus status;
