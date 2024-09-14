@@ -39,4 +39,9 @@ public class BidController {
         bidService.deleteBid(id);
         return ResponseEntity.status(200).body("Bid deleted");
     }
+
+    @GetMapping("/get-project-bid/{projectId}")
+    public ResponseEntity getProjectBid(@PathVariable int projectId) {
+        return ResponseEntity.status(200).body(bidService.getProjectBids(projectId));
+    }
 }
