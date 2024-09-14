@@ -43,17 +43,39 @@ public class UserController {
         return ResponseEntity.status(200).body("User deleted successfully");
     }
 
-
+    
     @PutMapping("/activate/{adminId}/{userId}")
     public ResponseEntity activateUser(@PathVariable Integer adminId,@PathVariable Integer userId){
         userService.activateUser(adminId,userId);
         return ResponseEntity.status(200).body("User activated successfully");
     }
 
+    // Suliman 
+    
     @PutMapping("/discount/{adminId}/{ownerId}")
     public ResponseEntity discountOwner(@PathVariable Integer adminId,@PathVariable Integer ownerId){
         userService.discountOwner(adminId,ownerId);
         return ResponseEntity.status(200).body("discount made to owner successfully");
     }
+
+    
+    // Suliman
+
+    @DeleteMapping("/delete-by-word/{word}")
+    public ResponseEntity deleteByComment(@PathVariable String word)
+    {
+        userService.deleteByWord(word);
+        return ResponseEntity.status(200).body("Comment deleted");
+    }
+
+    // Suliman 
+    
+    @PutMapping("/answer-question/{adminId}/{questionId}")
+    public ResponseEntity addAnswer(@PathVariable Integer adminId,@PathVariable Integer questionId, @RequestBody String answer)
+    {
+        userService.answerQuestion(adminId,questionId, answer);
+        return ResponseEntity.status(200).body(("Question answered successfully"));
+    }
+
 
 }
