@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-
+//*** All Done by Shahad ****
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
