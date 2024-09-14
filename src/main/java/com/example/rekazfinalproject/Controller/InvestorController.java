@@ -64,4 +64,31 @@ public class InvestorController {
         return ResponseEntity.status(200).body(new ApiResponse("Available date added successfully"));
     }
 
+    // Suliman 
+    
+        @GetMapping("/get-my-projects/{investorId}")
+    public ResponseEntity getMyProjects(@PathVariable int investorId) {
+        return ResponseEntity.status(200).body(investorService.getMyProjects(investorId));
+    }
+
+    // Suliman 
+    
+    @GetMapping("get-owner-projects/{ownerId}")
+    public ResponseEntity getOwnerProjects(@PathVariable int ownerId) {
+        return ResponseEntity.status(200).body(investorService.getOwnerProject(ownerId));
+    }
+
+    // Suliman
+    @GetMapping("/showhighestrate")
+    public ResponseEntity showHighestRate() {
+        return ResponseEntity.status(200).body(investorService.showHighestInvestorsRate());
+    }
+
+    // Suliman
+    @PutMapping("/add-Question/{investorId}")
+    public ResponseEntity addQuestion(@PathVariable int investorId , @RequestBody String question) {
+        investorService.investorAddQuestion(investorId,question);
+        return ResponseEntity.status(200).body("Question added successfully");
+    }
+
 }
