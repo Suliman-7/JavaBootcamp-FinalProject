@@ -2,17 +2,17 @@ package com.example.rekazfinalproject.Controller;
 
 import com.example.rekazfinalproject.Model.AvailableDate;
 import com.example.rekazfinalproject.Service.AvailableDateService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/availabledates")
+@RequestMapping("/api/v1/availabledate")
+
+    // All CRUD by suliman 
 
 
 public class AvailableDateController {
@@ -27,5 +27,17 @@ public class AvailableDateController {
     @GetMapping("/get-investor-available-dates/{investorId}")
     public ResponseEntity getInvestorAvailableDates(@PathVariable Integer investorId){
         return ResponseEntity.status(200).body(availableDateService.getInvestorAvailableDates(investorId));
+    }
+
+    @PutMapping("/update-available-date/{id}")
+    public ResponseEntity updateAvailableDate(@PathVariable Integer id, @Valid @RequestBody AvailableDate availableDate){
+        availableDateService.updateAvailableDate(id, availableDate);
+        return ResponseEntity.status(200).body("Available Date updated successfully");
+    }
+
+    @DeleteMapping("/delete-available-date/{id}")
+    public ResponseEntity deleteAvailableDate(@PathVariable Integer id){
+        availableDateService.deleteAvailableDate(id);
+        return ResponseEntity.status(200).body("Available Date deleted successfully");
     }
 }
