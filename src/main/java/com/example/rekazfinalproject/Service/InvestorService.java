@@ -229,4 +229,20 @@ public class InvestorService {
         questionRepository.save(question1);
     }
 
+     //shahad
+    //get investor Company have bid in the owner project
+    public List<Investor> listInvestorCompanyByOwner(Integer ownerId) {
+        User owner = userRepository.findUserById(ownerId);
+        if (owner == null || !owner.getRole().equalsIgnoreCase("Owner")) {
+            throw new ApiException("Owner not found");
+        }
+        //Find projects owned by the Owner
+        List<Project> ownerProjects = projectRepository.findProjectsByOwnerId(ownerId);
+        if (ownerProjects.isEmpty()) {
+            throw new ApiException("No projects found for this owner");
+        }
+       //Find investors who have bid on this Owner's projects.
+        return investorRepository.findInvestorsByProjects(ownerProjects);
+    }
+
 }
