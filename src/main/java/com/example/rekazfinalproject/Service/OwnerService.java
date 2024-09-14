@@ -142,8 +142,10 @@ public class OwnerService {
         if (bid.getStatus() == Bid.BidStatus.APPROVED) {
             throw new ApiException("Bid is already approved");
         }
-        Project project = projectRepository.findProjectById(bid.getProject().getId());
-        project.setStatus(Project.ProjectStatus.COMPLETED);
+       Project project = projectRepository.findProjectById(bid.getProject().getId());
+        //عدلت هنا
+        project.setInvestor(bid.getInvestor());
+        project.setStatus(Project.ProjectStatus.IN_PROGRESS);
         bid.setStatus(Bid.BidStatus.APPROVED);
         bidRepository.save(bid);
     }
