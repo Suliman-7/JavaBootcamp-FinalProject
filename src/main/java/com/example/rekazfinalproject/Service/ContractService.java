@@ -68,6 +68,10 @@ public class ContractService {
             throw new ApiException("Bid not approved");
         }
 
+                // End date should be after start date
+        if(contractDTO.getEndDate().isBefore(contractDTO.getStartDate()) || contractDTO.getEndDate().isEqual(contractDTO.getStartDate())){
+            throw new ApiException("End date should be after start date");
+        }
 
         Contract contract = new Contract(null, contractDTO.getTerms(),
                 contractDTO.getStartDate(), contractDTO.getEndDate(),
