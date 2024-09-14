@@ -89,4 +89,24 @@ public class BidService {
         bidRepository.delete(bid);
     }
 
+    // Suliman 
+
+        public List<Bid> getProjectBids(int projectId) {
+        List<Bid> projectBids = new ArrayList<>();
+        Project project = projectRepository.findProjectById(projectId);
+        if(project==null){
+            throw new ApiException("Project not found");
+        }
+        for(Bid bid1 : bidRepository.findAll()) {
+            if(bid1.getProject().getId()==projectId){
+                projectBids.add(bid1);
+            }
+
+        }
+        if(projectBids.size()==0){
+            throw new ApiException("No project found");
+        }
+        return projectBids;
+    }
+
     }
