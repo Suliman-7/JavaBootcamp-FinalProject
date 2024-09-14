@@ -30,15 +30,19 @@ public class ProjectService {
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
     }
-
+  //عدلت هنا
     // Suliman
     public void addProject( Integer ownerId , Project project) {
         Owner owner = ownerRepository.findOwnerById(ownerId);
         if (owner == null) {
             throw new ApiException("Owner not found");
         }
-        project.setOwner(owner);
-        project.setStatus(Project.ProjectStatus.IN_PROGRESS);
+         if(ownerUser.isActive()==false){
+            throw new ApiException("owner is not active");
+        }
+        project.setOwner(ownerUser.getOwner());
+        project.setPublication_date(LocalDate.now());
+        project.setStatus(Project.ProjectStatus.PENDING);
         projectRepository.save(project);
     }
 
@@ -147,5 +151,18 @@ public class ProjectService {
         }
         return projectRepository.findByProjectDateBetween(startDate , endDate);
     }
+    //Shahad
+    // investor get list project by budget
+    public List<Project> getProjectsByBudget(Integer investorId,double maxBudget) {
+        User invstorUser=userRepository.findUserById(investorId);
+        if(invstorUser==null||!invstorUser.getRole().equalsIgnoreCase("Investor")){
+            throw new ApiException("Investor not found");
+        }
+        if(invstorUser.isActive()==false){
+            throw new ApiException("Investor not Active");
+        }
+        return projectRepository.listProjectWithSpecvicedBudgetAndStatus(maxBudget);
+    }
+    
 
 }
