@@ -58,8 +58,15 @@ public class OwnerController {
     }
 
     @PutMapping("/reject-bid/{ownerId}/{bidId}")
-    public ResponseEntity rejectBid(@PathVariable Integer ownerId, @PathVariable int bidId) {
-        ownerService.rejectBid(ownerId , bidId);
+    public ResponseEntity rejectBid(@PathVariable int ownerId, @PathVariable int bidId , @RequestBody String comment) {
+        ownerService.rejectBid(ownerId , bidId , comment);
         return ResponseEntity.status(200).body("Bid rejected successfully");
     }
+
+    @PutMapping("/add-Question/{ownerId}")
+    public ResponseEntity addQuestion(@PathVariable int ownerId , @RequestBody String question) {
+        ownerService.ownerAddQuestion(ownerId,question);
+        return ResponseEntity.status(200).body("Question added successfully");
+    }
+
 }
