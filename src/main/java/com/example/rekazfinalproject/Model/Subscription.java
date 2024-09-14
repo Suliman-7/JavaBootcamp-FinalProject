@@ -27,7 +27,6 @@ public class Subscription {
     @Column(columnDefinition = "int not null")
     private int duration ;
 
-    @Pattern(regexp = "^(Standard|Premium)$")
     @Column(columnDefinition = "varchar(20) not null")
     private String type ;
 
