@@ -63,6 +63,14 @@ public class Owner {
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
     private Set<Rating> ratings;
+
+    @OneToOne(cascade = CascadeType.ALL,mappedBy = "owner")
+    private Subscription subscription;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
+    private Set<Question> questions;
+
+    
 //    @OneToMany(cascade = CascadeType.ALL , mappedBy = "owner")
 //    private Set<Project> projects;
 
