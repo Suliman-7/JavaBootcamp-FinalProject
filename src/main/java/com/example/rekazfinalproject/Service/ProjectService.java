@@ -51,6 +51,7 @@ public class ProjectService {
         project1.setTitle(project.getTitle());
         project1.setDescription(project.getDescription());
         project1.setProjectType(project.getProjectType());
+        project1.setCreationDate(project.getCreationDate());
         project1.setBudget(project.getBudget());
         project1.setDeadline(project.getDeadline());
         project1.setCity(project.getCity());
@@ -92,6 +93,59 @@ public class ProjectService {
     //Danah
     public List<Project> findByProjectType(String projectType) {
         return projectRepository.findProjectByProjectType(projectType);
+    }
+
+    // Suliman
+
+    public List<Project> getClosestProjects(){
+        List<Project> closestProject = projectRepository.findAll();
+
+        for (int i = 0; i < closestProject.size() - 1; i++) {
+            for (int j = 0; j < closestProject.size() - i - 1; j++) {
+                if (closestProject.get(j).getCreationDate().isAfter(closestProject.get(j + 1).getCreationDate()) || closestProject.get(j).getCreationDate().isEqual(closestProject.get(j + 1).getCreationDate())) {
+                    Project closest = closestProject.get(j);
+                    closestProject.set(j, closestProject.get(j + 1));
+                    closestProject.set(j + 1, closest);
+                }
+            }
+        }
+        if(closestProject.isEmpty()){
+            throw new ApiException("No project found");
+        }
+        return closestProject;
+    }
+
+    // Suliman
+
+    public List<Project> getHighestProjectsBudget(){
+        List<Project> highestProjects = projectRepository.findAll();
+
+        for (int i = 0; i < highestProjects.size() - 1; i++) {
+            for (int j = 0; j < highestProjects.size() - i - 1; j++) {
+                if (highestProjects.get(j).getBudget() <= highestProjects.get(j + 1).getBudget()) {
+                    Project highest = highestProjects.get(j);
+                    highestProjects.set(j, highestProjects.get(j + 1));
+                    highestProjects.set(j + 1, highest);
+                }
+            }
+        }
+        if(highestProjects.isEmpty()){
+            throw new ApiException("No project found");
+        }
+        return highestProjects;
+    }
+
+// Suliman
+
+
+    public List<Project> getProjectByDate(LocalDate startDate , LocalDate endDate){
+        if (startDate.isAfter(endDate)) {
+            throw new ApiException("Start date cannot be after end date");
+        }
+        if(projectRepository.findByProjectDateBetween(startDate, endDate).isEmpty()){
+            throw new ApiException("No project found in this date");
+        }
+        return projectRepository.findByProjectDateBetween(startDate , endDate);
     }
 
 }
