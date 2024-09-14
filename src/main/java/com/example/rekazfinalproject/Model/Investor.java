@@ -68,6 +68,9 @@ public class Investor {
     @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL)
     private List<Report> reports;
 
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "investor")
+    private Set<Question> questions;
+
 
 
 //    @OneToMany(cascade = CascadeType.ALL,mappedBy = "investor")
