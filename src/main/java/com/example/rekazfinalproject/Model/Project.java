@@ -45,18 +45,19 @@ public class Project {
     @Column(columnDefinition = "varchar(20) not null")
     private String projectType;
 
+    @NotNull(message = "Project start date should be not null")
     @Column(columnDefinition = "datetime")
-    private LocalDate publication_date;
-    
+    private LocalDate startDate;
+
+    @NotNull(message = "Project deadline should be not null")
     @Column(columnDefinition = "datetime")
     private LocalDate deadline;
 
     @Column(columnDefinition = "varchar(20)")
-
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
-    @NotNull(message = "City cannot be null")
+    @NotEmpty(message = "City cannot be null")
     @Column(columnDefinition = "varchar(20)")
     private String city;
 

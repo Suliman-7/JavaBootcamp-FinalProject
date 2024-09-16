@@ -20,13 +20,12 @@ public class ContractService {
     private final OwnerRepository ownerRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
-    private final BidRepository bidRepository;
 
     public List<Contract> getAllContract(){
         return contractRepository.findAll();
     }
 
-    public void addContract(Integer investorId , Integer ownerId , Integer projectId , ContractDTO contractDTO){
+    public void addContract(Integer ownerId , Integer investorId , Integer projectId , ContractDTO contractDTO){
         Investor investor = investorRepository.findInvestorById(investorId);
         if(investor==null){
             throw new ApiException("investor not found");
@@ -81,29 +80,43 @@ public class ContractService {
     }
 
 
-    public void updateContract( Integer id , Contract contract){
-        Contract contract1 = contractRepository.findContractById(id);
+    public void updateContract( Integer adminId , Integer contractId , ContractDTO contractDTO){
+        User adminUser = userRepository.findUserById(adminId);
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            throw new ApiException("Only admins can activate users");
+        }
+        Contract contract1 = contractRepository.findContractById(contractId);
         if(contract1==null){
             throw new ApiException("contract not found");
         }
-        contract1.setEndDate(contract.getEndDate());
-        // contract1.setStartDate(contract.getStartDate());
-        contract1.setStatus(contract.getStatus());
-        contract1.setTerms(contract.getTerms());
+        contract1.setEndDate(contractDTO.getEndDate());
+        contract1.setStartDate(contractDTO.getStartDate());
+        contract1.setTerms(contractDTO.getTerms());
         contractRepository.save(contract1);
 
     }
 
-    public void deleteContract(int id){
-        Contract contract1 = contractRepository.findContractById(id);
+    public void deleteContract( Integer adminId , Integer contractId ){
+        User adminUser = userRepository.findUserById(adminId);
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            throw new ApiException("Only admins can activate users");
+        }
+        Contract contract1 = contractRepository.findContractById(contractId);
         if(contract1==null){
             throw new ApiException("contract not found");
         }
+        Owner owner = ownerRepository.findOwnerById(contract1.getOwner().getId());
+        owner.getContracts().remove(contract1);
+        Investor investor = investorRepository.findInvestorById(contract1.getInvestor().getId());
+        investor.getContracts().remove(contract1);
+        Project project = projectRepository.findProjectById(contract1.getProject().getId());
+        project.setContract(null);
+
         contractRepository.delete(contract1);
     }
 
     //Dana
-    public void approveContract(Integer contractId, Integer investorId) {
+    public void approveContract(Integer investorId, Integer contractId) {
         User investorUser = userRepository.findUserById(investorId);
         if (investorUser == null) {
             throw new ApiException("Investor not found");
@@ -118,6 +131,11 @@ public class ContractService {
             throw new ApiException("Contract is already Valid");
         } else if (contract.getStatus() == Contract.ContractStatus.EXPIRED) {
             throw new ApiException("Contract has been Expired");
+        }
+
+        if(contract.getInvestor().getId()!=investorId){
+            throw new ApiException("Investor dont have authority");
+
         }
 
         contract.setStatus(Contract.ContractStatus.VALID);
@@ -128,7 +146,7 @@ public class ContractService {
     }
 
     //Dana
-    public void rejectContract(Integer contractId, Integer investorId) {
+    public void rejectContract(Integer investorId, Integer contractId) {
         User investorUser = userRepository.findUserById(investorId);
         if (investorUser == null) {
             throw new ApiException("Investor not found");
@@ -143,6 +161,11 @@ public class ContractService {
             throw new ApiException("Contract is already Valid");
         } else if (contract.getStatus() == Contract.ContractStatus.EXPIRED) {
             throw new ApiException("Contract has been Expired");
+        }
+
+        if(contract.getInvestor().getId()!=investorId){
+            throw new ApiException("Investor dont have authority");
+
         }
 
         Project project = contract.getProject();

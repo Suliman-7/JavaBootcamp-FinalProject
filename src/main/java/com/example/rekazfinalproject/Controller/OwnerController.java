@@ -1,11 +1,14 @@
 package com.example.rekazfinalproject.Controller;
 
 import com.example.rekazfinalproject.DTO.OwnerDTO;
+import com.example.rekazfinalproject.Model.Owner;
 import com.example.rekazfinalproject.Model.Project;
+import com.example.rekazfinalproject.Model.User;
 import com.example.rekazfinalproject.Service.OwnerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,57 +19,48 @@ public class OwnerController {
     private final OwnerService ownerService;
 
     //*** All CRUD Done by Danah ****
-    @GetMapping("/get")
+    @GetMapping("/get-all-owners")
     public ResponseEntity getAllOwners(){
         return ResponseEntity.status(200).body(ownerService.getAllOwners());
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register-owner")
     public ResponseEntity registerOwner(@Valid @RequestBody OwnerDTO ownerDTO) {
         ownerService.registerOwner(ownerDTO);
         return ResponseEntity.status(200).body("Owner registered successfully");
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity updateOwner(@PathVariable Integer id, @Valid @RequestBody OwnerDTO ownerDTO) {
-        ownerService.updateOwner(id, ownerDTO);
+    @PutMapping("/update-owner")
+    public ResponseEntity updateOwner(@AuthenticationPrincipal User user, @Valid @RequestBody OwnerDTO ownerDTO) {
+        ownerService.updateOwner(user.getOwner().getId(), ownerDTO);
         return ResponseEntity.status(200).body("Owner updated successfully");
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteOwner(@PathVariable Integer id) {
-        ownerService.deleteOwner(id);
+    @DeleteMapping("/delete-owner")
+    public ResponseEntity deleteOwner(@AuthenticationPrincipal User user) {
+        ownerService.deleteOwner(user.getOwner().getId());
         return ResponseEntity.status(200).body("Owner deleted successfully");
     }
 
 
-    @PostMapping("/add-project/{ownerId}")
-    public ResponseEntity addProject(@PathVariable Integer ownerId , @Valid @RequestBody Project project) {
-        ownerService.addProject( ownerId , project );
-        return ResponseEntity.status(200).body("project added successfully");
+    @GetMapping("/get-my-projects")
+    public ResponseEntity getMyProjects(@AuthenticationPrincipal User user) {
+        return ResponseEntity.status(200).body(ownerService.getMyProjects(user.getOwner().getId()));
     }
 
-    @GetMapping("/get-my-projects/{ownerId}")
-    public ResponseEntity getMyProjects(@PathVariable Integer ownerId) {
-        return ResponseEntity.status(200).body(ownerService.getMyProjects(ownerId));
-    }
 
-    @PutMapping("/approve-bid/{ownerId}/{bidId}")
-    public ResponseEntity approveBid(@PathVariable Integer ownerId, @PathVariable int bidId) {
-        ownerService.approveBid(ownerId , bidId);
+
+    @PutMapping("/approve-bid/{bidId}")
+    public ResponseEntity approveBid(@AuthenticationPrincipal User user, @PathVariable int bidId) {
+        ownerService.approveBid(user.getOwner().getId() , bidId);
         return ResponseEntity.status(200).body("Bid approved successfully");
     }
 
-    @PutMapping("/reject-bid/{ownerId}/{bidId}")
-    public ResponseEntity rejectBid(@PathVariable int ownerId, @PathVariable int bidId , @RequestBody String comment) {
-        ownerService.rejectBid(ownerId , bidId , comment);
+    @PutMapping("/reject-bid/{bidId}")
+    public ResponseEntity rejectBid(@AuthenticationPrincipal User user, @PathVariable int bidId , @RequestBody String comment) {
+        ownerService.rejectBid(user.getOwner().getId() , bidId , comment);
         return ResponseEntity.status(200).body("Bid rejected successfully");
     }
 
-    @PutMapping("/add-Question/{ownerId}")
-    public ResponseEntity addQuestion(@PathVariable int ownerId , @RequestBody String question) {
-        ownerService.ownerAddQuestion(ownerId,question);
-        return ResponseEntity.status(200).body("Question added successfully");
-    }
 
 }

@@ -2,10 +2,12 @@ package com.example.rekazfinalproject.Controller;
 
 import com.example.rekazfinalproject.Api.ApiResponse;
 import com.example.rekazfinalproject.Model.Consultation;
+import com.example.rekazfinalproject.Model.User;
 import com.example.rekazfinalproject.Service.ConsultationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,56 +16,60 @@ import org.springframework.web.bind.annotation.*;
 public class ConsultationController {
     private final ConsultationService consultationService;
 
-    
-    @GetMapping("/get/{id}")
-    public ResponseEntity getAllConsultations(@PathVariable Integer id){
-        return ResponseEntity.status(200).body(consultationService.getAllConsultations(id));
+
+    @GetMapping("/get-all-consultations")
+    public ResponseEntity getAllConsultations(){
+        return ResponseEntity.status(200).body(consultationService.getAllConsultations());
+    }
+    @GetMapping("/get-my-consultations")
+    public ResponseEntity getMyConsultation(@AuthenticationPrincipal User user){
+        return ResponseEntity.status(200).body(consultationService.getMyConsultation(user.getId()));
     }
 
-    @PostMapping("/book-consultation/{ownerId}/{investorId}")
-    public ResponseEntity addConsultation(@PathVariable Integer ownerId,@PathVariable Integer investorId,@Valid @RequestBody Consultation consultation){
-        consultationService.bookConsultation(ownerId,investorId,consultation);
+    @PostMapping("/book-consultation/{investorId}")
+    public ResponseEntity addConsultation(@AuthenticationPrincipal User user,@PathVariable Integer investorId,@Valid @RequestBody Consultation consultation){
+        consultationService.bookConsultation(user.getId(),investorId,consultation);
         return ResponseEntity.status(200).body(new ApiResponse("Consultation successfully added"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity updateConsultation (@PathVariable Integer id , @Valid @RequestBody Consultation consultation){
-        consultationService.updateConsultation(id, consultation);
+    @PutMapping("/update-consultation/{id}")
+    public ResponseEntity updateConsultation (@AuthenticationPrincipal User user,@PathVariable Integer id , @Valid @RequestBody Consultation consultation){
+        consultationService.updateConsultation(user.getId(),id, consultation);
         return ResponseEntity.status(200).body(new ApiResponse("Consultation successfully updated"));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteConsultation(@PathVariable Integer id){
-        consultationService.deleteConsultation(id);
+    @DeleteMapping("/delete-consultations/{id}")
+    public ResponseEntity deleteConsultation(@AuthenticationPrincipal User user,@PathVariable Integer id){
+        consultationService.deleteConsultation(user.getId(),id);
         return ResponseEntity.status(200).body(new ApiResponse("Consultation successfully deleted"));
     }
-    @PutMapping("/extend-duration/{ownerId}/{conId}/{duration}")
-    public ResponseEntity extendConsultationDuration(@PathVariable Integer ownerId,@PathVariable Integer conId,@PathVariable double duration){
-        consultationService.extendConsultationDuration(ownerId,conId,duration);
+    @PutMapping("/extend-duration/{consultationId}/{duration}")
+    public ResponseEntity extendConsultationDuration(@AuthenticationPrincipal User user,@PathVariable Integer consultationId,@PathVariable double duration){
+        consultationService.extendConsultationDuration(user.getId(),consultationId,duration);
         return ResponseEntity.status(200).body(new ApiResponse("The duration has been updated successfully."));
     }
-    @PutMapping("/canceled/owner-id/{ownerid}/con-id/{conid}")
-    public ResponseEntity ownerCanceledConsultation(@PathVariable Integer ownerid,@PathVariable Integer conid){
-        consultationService.ownerCanceledConsultation(ownerid,conid);
+    @PutMapping("/investor-cancel-consultation/{consultationId}")
+    public ResponseEntity ownerCanceledConsultation(@AuthenticationPrincipal User user,@PathVariable Integer consultationId){
+        consultationService.ownerCanceledConsultation(user.getId(),consultationId);
         return ResponseEntity.status(200).body(new ApiResponse("Owner canceled consultation "));
     }
-    @PutMapping("/canceled/investor-id/{investorid}/con-id/{conid}")
-    public ResponseEntity  InvestorCanceledConsultation(@PathVariable Integer investorid,@PathVariable Integer conid){
-        consultationService.investorCanceledConsultation(investorid,conid);
+    @PutMapping("/owner-cancel-consultation/{consultationId}")
+    public ResponseEntity  InvestorCanceledConsultation(@AuthenticationPrincipal User user,@PathVariable Integer consultationId){
+        consultationService.investorCanceledConsultation(user.getId(),consultationId);
         return ResponseEntity.status(200).body(new ApiResponse("Investor canceled consultation"));
     }
 
-    @GetMapping("/get-available-consultation/{owner}/{investor}")
-    public ResponseEntity getAvailableConsultationDates(@PathVariable Integer owner,@PathVariable Integer investor){
-        return ResponseEntity.status(200).body(consultationService.getAvailableConsultationDatesForInvestor(owner,investor));
+    @GetMapping("/get-available-consultation/{investorId}")
+    public ResponseEntity getAvailableConsultationDates(@AuthenticationPrincipal User user,@PathVariable Integer investorId){
+        return ResponseEntity.status(200).body(consultationService.getAvailableConsultationDatesForInvestor(user.getId(),investorId));
     }
-    @GetMapping("/get-owner-consultation/{owner}")
-    public ResponseEntity listConsultationForOwner(@PathVariable Integer owner){
-        return ResponseEntity.status(200).body(consultationService.listConsultationForOwner(owner));
+    @GetMapping("/get-owner-consultation")
+    public ResponseEntity listConsultationForOwner(@AuthenticationPrincipal User user){
+        return ResponseEntity.status(200).body(consultationService.listConsultationForOwner(user.getId()));
     }
 
-    @GetMapping("/get-investor-consultation/{investor}")
-    public ResponseEntity listConsultationForInvestor(@PathVariable Integer investor){
-        return ResponseEntity.status(200).body(consultationService.listConsultationsForInvestor(investor));
+    @GetMapping("/get-investor-consultation")
+    public ResponseEntity listConsultationForInvestor(@AuthenticationPrincipal User user){
+        return ResponseEntity.status(200).body(consultationService.listConsultationsForInvestor(user.getId()));
     }
 }

@@ -1,18 +1,13 @@
 package com.example.rekazfinalproject.Service;
 
 import com.example.rekazfinalproject.Api.ApiException;
-import com.example.rekazfinalproject.Model.Bid;
-import com.example.rekazfinalproject.Model.Contract;
-import com.example.rekazfinalproject.Model.Owner;
-import com.example.rekazfinalproject.Model.Project;
-import com.example.rekazfinalproject.Repository.BidRepository;
-import com.example.rekazfinalproject.Repository.ContractRepository;
-import com.example.rekazfinalproject.Repository.OwnerRepository;
-import com.example.rekazfinalproject.Repository.ProjectRepository;
+import com.example.rekazfinalproject.Model.*;
+import com.example.rekazfinalproject.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,37 +20,62 @@ public class ProjectService {
     private final BidRepository bidRepository;
     private final ContractRepository contractRepository;
     private final OwnerRepository ownerRepository;
+    private final UserRepository userRepository;
+    private final PropertyRepository propertyRepository;
 
     // Suliman
     public List<Project> getAllProjects() {
-        return projectRepository.findAll();
+        List<Project> allProjects = new ArrayList<>();
+        for (Project project : projectRepository.findAll() ) {
+            if(project.getOwner().getSubscription()!=null){
+                allProjects.add(project);
+            }
+        }
+        for (Project project : projectRepository.findAll() ) {
+            if(project.getOwner().getSubscription()==null){
+                allProjects.add(project);
+            }
+        }
+        return allProjects;
+
     }
+
+
   //عدلت هنا
     // Suliman
-    public void addProject( Integer ownerId , Project project) {
+    public void addProject( Integer ownerId , Integer propertyId , Project project) {
         Owner owner = ownerRepository.findOwnerById(ownerId);
-        if (owner == null) {
-            throw new ApiException("Owner not found");
+
+        Property property = propertyRepository.findPropertyById(propertyId);
+        if(property==null){
+            throw new ApiException("property not found");
         }
-         if(ownerUser.isActive()==false){
-            throw new ApiException("owner is not active");
+
+        if(!owner.getUser().isActive()){
+            throw new ApiException("User is not active");
         }
-        project.setOwner(ownerUser.getOwner());
-        project.setPublication_date(LocalDate.now());
+        project.setOwner(owner);
         project.setStatus(Project.ProjectStatus.PENDING);
+        project.setProperty(property);
         projectRepository.save(project);
     }
 
     // Suliman
-    public void updateProject(Integer id , Project project) {
-        Project project1 = projectRepository.findProjectById(id);
+    public void updateProject( Integer ownerId , Integer projectId , Project project) {
+        Project project1 = projectRepository.findProjectById(projectId);
         if (project1 == null) {
             throw new ApiException("Project not found");
         }
+
+        User user = userRepository.findUserById(ownerId);
+        if(project1.getOwner().getId() != user.getId()){
+            throw new ApiException("User id mismatch");
+        }
+
         project1.setTitle(project.getTitle());
         project1.setDescription(project.getDescription());
         project1.setProjectType(project.getProjectType());
-        project1.setCreationDate(project.getCreationDate());
+        // project1.setCreationDate(project.getCreationDate());
         project1.setBudget(project.getBudget());
         project1.setDeadline(project.getDeadline());
         project1.setCity(project.getCity());
@@ -64,26 +84,36 @@ public class ProjectService {
 
 
     // Suliman
-    public void deleteProject(Integer id) {
+    public void deleteProject( Integer ownerId , Integer projectId ) {
+
+        Project project1 = projectRepository.findProjectById(projectId);
+        if (project1 == null) {
+            throw new ApiException("Project not found");
+        }
+
+        User user = userRepository.findUserById(ownerId);
+        if(project1.getOwner().getId() != user.getId()){
+            throw new ApiException("User id mismatch");
+        }
 
         for (Contract contract : contractRepository.findAll() ) {
-            if (contract.getProject().getId() == id) {
+            if (contract.getProject().getId() == projectId) {
                 throw new ApiException("Project is associated with this investor company you cannot delete this project");
             }
         }
 
 
-        Project project = projectRepository.findProjectById(id);
+        Project project = projectRepository.findProjectById(projectId);
         if (project == null) {
             throw new ApiException("Project not found");
         }
 
 
-        for (Bid bid : bidRepository.findAll() ) {
-            if (bid.getProject().getId() == id) {
-                bidRepository.delete(bid);
-            }
-        }
+//        for (Bid bid : bidRepository.findAll() ) {
+//            if (bid.getProject().getId() == projectId) {
+//                bidRepository.delete(bid);
+//            }
+//        }
 
 
         projectRepository.delete(project);
@@ -101,12 +131,29 @@ public class ProjectService {
 
     // Suliman
 
+    public List<Project> getOwnerProjects(Integer ownerId) {
+        List<Project> ownerProjects = new ArrayList<>();
+        Owner owner = ownerRepository.findOwnerById(ownerId);
+
+        for(Project project : projectRepository.findAll()){
+            if (project.getOwner().equals(owner)) {
+                ownerProjects.add(project);
+            }
+        }
+        if (ownerProjects.isEmpty()) {
+            throw new ApiException("Owner doesn't have any projects");
+        }
+        return ownerProjects;
+    }
+
+    // Suliman
+
     public List<Project> getClosestProjects(){
         List<Project> closestProject = projectRepository.findAll();
 
         for (int i = 0; i < closestProject.size() - 1; i++) {
             for (int j = 0; j < closestProject.size() - i - 1; j++) {
-                if (closestProject.get(j).getCreationDate().isAfter(closestProject.get(j + 1).getCreationDate()) || closestProject.get(j).getCreationDate().isEqual(closestProject.get(j + 1).getCreationDate())) {
+                if (closestProject.get(j).getStartDate().isAfter(closestProject.get(j + 1).getStartDate()) || closestProject.get(j).getStartDate().isEqual(closestProject.get(j + 1).getStartDate())) {
                     Project closest = closestProject.get(j);
                     closestProject.set(j, closestProject.get(j + 1));
                     closestProject.set(j + 1, closest);
@@ -153,12 +200,12 @@ public class ProjectService {
     }
     //Shahad
     // investor get list project by budget
-    public List<Project> getProjectsByBudget(Integer investorId,double maxBudget) {
+    public List<Project> getProjectsByBudget( int investorId , double maxBudget) {
         User invstorUser=userRepository.findUserById(investorId);
         if(invstorUser==null||!invstorUser.getRole().equalsIgnoreCase("Investor")){
             throw new ApiException("Investor not found");
         }
-        if(invstorUser.isActive()==false){
+        if(!invstorUser.isActive()){
             throw new ApiException("Investor not Active");
         }
         return projectRepository.listProjectWithSpecvicedBudgetAndStatus(maxBudget);

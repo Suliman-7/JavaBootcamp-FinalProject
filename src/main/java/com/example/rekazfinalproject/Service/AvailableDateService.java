@@ -62,7 +62,7 @@ public class AvailableDateService {
             throw new ApiException("Investor not found");
         }
         availableDate1.setDate(availableDate.getDate());
-        availableDate1.setBooked(availableDate.isBooked());
+        availableDate1.setBooked(availableDate.getBooked());
         availableDateRepository.save(availableDate1);
     }
 
@@ -71,7 +71,7 @@ public class AvailableDateService {
         if(availableDate==null){
             throw new ApiException("Investor not found");
         }
-        if(availableDate.isBooked()){
+        if(availableDate.getBooked()){
             throw new ApiException("Booked date can't be deleted");
         }
 

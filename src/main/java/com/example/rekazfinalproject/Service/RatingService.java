@@ -1,8 +1,8 @@
 package com.example.rekazfinalproject.Service;
 
 import com.example.rekazfinalproject.Api.ApiException;
-import com.example.rekazfinalproject.Model.Rating;
-import com.example.rekazfinalproject.Repository.RatingRepository;
+import com.example.rekazfinalproject.Model.*;
+import com.example.rekazfinalproject.Repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,18 +11,27 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class RatingService {
-      private final RatingRepository ratingRepository;
+    private final RatingRepository ratingRepository;
     private final UserRepository userRepository;
     private final ContractRepository contractRepository;
     private final InvestorRepository investorRepository;
-    private final OwnerRepository ownerRepository;
     //Shahad
-
+//Admin
     public List<Rating> getAllRating() {
         return ratingRepository.findAll();
     }
 
+    //investor
+    public List<Rating> getMyRating(Integer investorId) {
+        Investor investor = investorRepository.findInvestorById(investorId);
+        if(investor==null){
+            throw new ApiException("Investor not found");
+        }
+        return ratingRepository.findRatingByInvestor(investor);
+    }
+
     //  shahad
+    //Owner
     public void addNewRating(Integer ownerId, Integer investorId, Rating rating) {
         User investorUser = userRepository.findUserById(investorId);
         if (investorUser == null) {
@@ -43,17 +52,20 @@ public class RatingService {
             throw new ApiException("Owner and Investor dont have connection");
         }
         rating.setInvestor(investorUser.getInvestor());
-        //Q
         rating.setOwner(ownerUser.getOwner());
         ratingRepository.save(rating);
     }
 
     //Shahad
-    public void updateRating(Integer id, Rating rating) {
-        Rating rating1 = ratingRepository.findRatingById(id);
-
+    //مدري مين على اساس انه ادمن
+    public void updateRating(Integer adminId,Integer ratingId, Rating rating) {
+        Rating rating1 = ratingRepository.findRatingById(ratingId);
         if (rating1 == null) {
             throw new ApiException("Rating not found");
+        }
+        User adminUser=userRepository.findUserById(adminId);
+        if(adminUser==null||!adminUser.getRole().equalsIgnoreCase("ADMIN")){
+            throw new ApiException("You do not have the authority");
         }
         rating1.setComment(rating.getComment());
         rating1.setScore(rating.getScore());
@@ -83,4 +95,5 @@ public class RatingService {
         }
         return averageRating;
     }
+
 }

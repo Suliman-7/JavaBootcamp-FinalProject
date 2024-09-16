@@ -11,10 +11,9 @@ import lombok.Data;
 
 public class SubscriptionDTO {
 
+    private int ownerId;
+
     @NotNull(message = "Subscription duration should be not empty ")
     private int duration ;
 
-    @NotEmpty(message = "Subscription type should be not empty ")
-    @Pattern(regexp = "^(Standard|Premium)$")
-    private String type ;
 }

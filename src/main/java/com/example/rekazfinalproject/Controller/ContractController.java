@@ -2,10 +2,12 @@ package com.example.rekazfinalproject.Controller;
 
 import com.example.rekazfinalproject.DTO.ContractDTO;
 import com.example.rekazfinalproject.Model.Contract;
+import com.example.rekazfinalproject.Model.User;
 import com.example.rekazfinalproject.Service.ContractService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,34 +24,34 @@ public class ContractController {
         return ResponseEntity.status(200).body(contractService.getAllContract());
     }
 
-    @PostMapping("/add-contract/{investorId}/{ownerId}/{projectId}")
+    @PostMapping("/add-contract/{investorId}/{projectId}")
 
-    public ResponseEntity addContract(@PathVariable Integer investorId , @PathVariable Integer ownerId , @PathVariable Integer projectId , @Valid @RequestBody ContractDTO contractDTO){
-        contractService.addContract(investorId,ownerId,projectId,contractDTO);
+    public ResponseEntity addContract(@AuthenticationPrincipal User user , @PathVariable Integer investorId , @PathVariable Integer projectId , @Valid @RequestBody ContractDTO contractDTO){
+        contractService.addContract(user.getOwner().getId(),investorId,projectId,contractDTO);
         return ResponseEntity.status(200).body("contract added successfully");
     }
 
-    @PutMapping("/update-contract/{id}")
-    public ResponseEntity updateContract(@PathVariable Integer id, @Valid  @RequestBody Contract contract){
-        contractService.updateContract(id, contract);
+    @PutMapping("/update-contract/{contractId}")
+    public ResponseEntity updateContract( @AuthenticationPrincipal User user , @PathVariable Integer contractId, @Valid  @RequestBody ContractDTO contractDTO){
+        contractService.updateContract( user.getId() , contractId , contractDTO);
         return ResponseEntity.status(200).body("contract updated successfully");
     }
 
-//    @DeleteMapping("/delete-contract/{id}")
-//    public ResponseEntity deleteContract(@PathVariable int id){
-//        contractService.deleteContract(id);
-//        return ResponseEntity.status(200).body("contract deleted successfully");
-//    }
+    @DeleteMapping("/delete-contract/{contractId}")
+    public ResponseEntity deleteContract( @AuthenticationPrincipal User user , @PathVariable Integer contractId){
+        contractService.deleteContract(user.getId() , contractId );
+        return ResponseEntity.status(200).body("contract deleted successfully");
+    }
 
-    @PostMapping("/{contractId}/{investorId}/approve")
-    public ResponseEntity approveContract(@PathVariable Integer contractId, @PathVariable Integer investorId) {
-        contractService.approveContract(contractId, investorId);
+    @PutMapping("/approve-contract/{contractId}")
+    public ResponseEntity approveContract(@AuthenticationPrincipal User user, @PathVariable Integer contractId) {
+        contractService.approveContract(user.getInvestor().getId(), contractId);
         return ResponseEntity.status(200).body("Contract approved successfully");
     }
 
-    @PostMapping("/{contractId}/{investorId}/reject")
-    public ResponseEntity rejectContract(@PathVariable Integer contractId, @PathVariable Integer investorId) {
-        contractService.rejectContract(contractId, investorId);
+    @PutMapping("/reject-contract/{contractId}")
+    public ResponseEntity rejectContract(@AuthenticationPrincipal User user, @PathVariable Integer contractId) {
+        contractService.rejectContract(user.getInvestor().getId(), contractId);
         return ResponseEntity.status(200).body("Contract rejected successfully");
     }
 }

@@ -39,12 +39,11 @@ public class Investor {
     @Column(columnDefinition = "varchar(100) not null")
     private String investorSectors;
 
-    
-    @Column(columnDefinition = "double")
-    private double rate ;
-
     @PastOrPresent(message = "Creation date must be in the past or today")
     private LocalDate createdAt;
+
+    @Column(columnDefinition = "double")
+    private double rate ;
 
     @OneToOne
     @MapsId
@@ -72,8 +71,6 @@ public class Investor {
     @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL)
     private List<Report> reports;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "investor")
-    private Set<Question> questions;
 
 
 

@@ -2,18 +2,14 @@ package com.example.rekazfinalproject.Service;
 
 import com.example.rekazfinalproject.Api.ApiException;
 import com.example.rekazfinalproject.DTO.InvestorDTO;
-import com.example.rekazfinalproject.Model.Bid;
-import com.example.rekazfinalproject.Model.Investor;
-import com.example.rekazfinalproject.Model.Project;
-import com.example.rekazfinalproject.Model.User;
-import com.example.rekazfinalproject.Repository.BidRepository;
-import com.example.rekazfinalproject.Repository.InvestorRepository;
-import com.example.rekazfinalproject.Repository.ProjectRepository;
-import com.example.rekazfinalproject.Repository.UserRepository;
+import com.example.rekazfinalproject.Model.*;
+import com.example.rekazfinalproject.Repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,14 +21,18 @@ public class InvestorService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final BidRepository bidRepository;
-
+    private final OwnerRepository ownerRepository;
+    private final QuestionRepository questionRepository;
+    //Admin
     public List<Investor> getAllInvestor(){
         return investorRepository.findAll();
     }
+    //primt
     public void registerInvestor(InvestorDTO investorDTO) {
         User user = new User();
         user.setUsername(investorDTO.getUsername());
-        user.setPassword(investorDTO.getPassword());
+        String hash = new BCryptPasswordEncoder().encode(investorDTO.getPassword());
+        user.setPassword(hash);
         user.setEmail(investorDTO.getEmail());
         user.setRole("INVESTOR");
 
@@ -43,17 +43,20 @@ public class InvestorService {
         investor.setCreatedAt(LocalDate.now());
         investor.setUser(user);
 
+
         user.setInvestor(investor);
 
         userRepository.save(user);
     }
 
-    public void updateInvestor(Integer id, InvestorDTO investorDTO) {
+    public void updateInvestor(Integer userId,Integer id, InvestorDTO investorDTO) {
         Investor investor = investorRepository.findInvestorById(id);
         if (investor == null) {
             throw new ApiException("investor not found");
         }
-
+        if(investor.getId()!=userId){
+            throw new ApiException("You do not have the authority");
+        }
         investor.setCommercialRegister(investorDTO.getCommercialRegister());
         investor.setNumOfInvest(investorDTO.getNumOfInvest());
         investor.setInvestorSectors(investorDTO.getInvestorSectors());
@@ -61,12 +64,17 @@ public class InvestorService {
 
         User user = investor.getUser();
         user.setUsername(investorDTO.getUsername());
-        user.setPassword(investorDTO.getPassword());
+        String hash = new BCryptPasswordEncoder().encode(investorDTO.getPassword());
+        user.setPassword(hash);
         user.setEmail(investorDTO.getEmail());
         userRepository.save(user);
     }
 
-    public void deleteInvestor(Integer id) {
+    public void deleteInvestor(Integer adminId,Integer id) {
+        User user = userRepository.findUserById(adminId);
+        if (!user.getRole().equalsIgnoreCase("ADMIN")) {
+            throw new ApiException("You do not have the authority");
+        }
         User investor = userRepository.findUserById(id);
         if (investor == null) {
             throw new ApiException("investor not found");
@@ -75,7 +83,6 @@ public class InvestorService {
     }
 
     // Investor add bid in specific project , made by suliman
-
     public void addBid( Integer investorId , Integer projectId , Bid bid) {
 
         Project project = projectRepository.findProjectById(projectId);
@@ -197,8 +204,6 @@ public class InvestorService {
     // Suliman
 
     public List<Investor> showHighestInvestorsRate() {
-
-
         List<Investor> highestRev = investorRepository.findAll();
 
         for (int i = 0; i < highestRev.size() - 1; i++) {
@@ -216,20 +221,7 @@ public class InvestorService {
 
     }
 
-    // Suliman
-
-    public void investorAddQuestion(Integer investorId,String question)
-    {
-        if(investorRepository.findInvestorById(investorId) == null)
-        {
-            throw new ApiException("Investor not found");
-        }
-
-        Question question1 = new Question(null,question,null,investorRepository.findInvestorById(investorId),null);
-        questionRepository.save(question1);
-    }
-
-     //shahad
+    //shahad
     //get investor Company have bid in the owner project
     public List<Investor> listInvestorCompanyByOwner(Integer ownerId) {
         User owner = userRepository.findUserById(ownerId);
@@ -241,7 +233,7 @@ public class InvestorService {
         if (ownerProjects.isEmpty()) {
             throw new ApiException("No projects found for this owner");
         }
-       //Find investors who have bid on this Owner's projects.
+        //Find investors who have bid on this Owner's projects.
         return investorRepository.findInvestorsByProjects(ownerProjects);
     }
 

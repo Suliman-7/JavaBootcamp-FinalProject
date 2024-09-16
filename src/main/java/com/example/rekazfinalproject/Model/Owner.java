@@ -28,16 +28,20 @@ public class Owner {
     private Integer id;
 
     @NotNull(message = "Commercial Register must not be null")
+    @Column(columnDefinition = "int not null")
     @Positive(message = "Commercial Register must be a positive number")
     private int commercialRegister;
 
     @NotEmpty(message = "Scope of Work must not be blank")
+    @Column(columnDefinition = "varchar(100) not null")
     @Size(min = 5, max = 100, message = "Scope of Work must be between 5 and 100 characters")
     private String scopeOfWork;
 
     @PositiveOrZero(message = "Number of Projects must be zero or positive")
+    @Column(columnDefinition = "int not null")
     private int numOfProject;
 
+    @Column(columnDefinition = "datetime")
     private LocalDate createdAt;
 
     private double discountPercentage = 0 ;
@@ -59,6 +63,9 @@ public class Owner {
     private Set<Consultation> consultations;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
+    private Set<Contract> contracts;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
     private Set<Property> properties;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
@@ -67,8 +74,9 @@ public class Owner {
     @OneToOne(cascade = CascadeType.ALL,mappedBy = "owner")
     private Subscription subscription;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "owner")
-    private Set<Question> questions;
+
+
+
 
     
 //    @OneToMany(cascade = CascadeType.ALL , mappedBy = "owner")

@@ -28,6 +28,7 @@ public class Bid {
     @Column(columnDefinition = "varchar(100) not null")
     private String description;
 
+    @NotNull(message = "Project deadline should be not null")
     @Column(columnDefinition = "datetime")
     private LocalDate deadline;
 

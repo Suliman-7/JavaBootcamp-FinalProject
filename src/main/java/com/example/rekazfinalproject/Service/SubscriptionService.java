@@ -28,7 +28,7 @@ public class SubscriptionService {
         return subscriptionRepository.findAll();
     }
 
-    public void addSubscription( int ownerId , SubscriptionDTO subscriptionDTO) {
+    public void subscribeOwner( Integer ownerId , SubscriptionDTO subscriptionDTO) {
 
         Owner owner = ownerRepository.findOwnerById(ownerId);
         if(owner == null) {
@@ -48,52 +48,47 @@ public class SubscriptionService {
 
         int price = 0 ;
 
-        if(subscriptionDTO.getDuration()==1 && subscriptionDTO.getType().equalsIgnoreCase("Standard")){
+        if(subscriptionDTO.getDuration()==1){
             price = 99 ;
         }
 
-        if(subscriptionDTO.getDuration()==1 && subscriptionDTO.getType().equalsIgnoreCase("Premium")){
+        if(subscriptionDTO.getDuration()==3){
             price = 149 ;
         }
 
-        if(subscriptionDTO.getDuration()==3 && subscriptionDTO.getType().equalsIgnoreCase("Standard")){
+        if(subscriptionDTO.getDuration()==6){
             price = 249 ;
         }
 
-        if(subscriptionDTO.getDuration()==3 && subscriptionDTO.getType().equalsIgnoreCase("Premium")){
-            price = 349 ;
-        }
-
-        if(subscriptionDTO.getDuration()==6 && subscriptionDTO.getType().equalsIgnoreCase("Standard")){
-            price = 499 ;
-        }
-
-        if(subscriptionDTO.getDuration()==6 && subscriptionDTO.getType().equalsIgnoreCase("Premium")){
-            price = 649 ;
-        }
 
 
 
-
-        Subscription subscription = new Subscription(null,subscriptionDTO.getDuration(),subscriptionDTO.getType(),price,Subscription.SubscriptionStatus.VALID, LocalDate.now(),LocalDate.now().plusMonths(subscriptionDTO.getDuration()),owner);
+        Subscription subscription = new Subscription(subscriptionDTO.getOwnerId(),subscriptionDTO.getDuration(),price,Subscription.SubscriptionStatus.VALID, LocalDate.now(),LocalDate.now().plusMonths(subscriptionDTO.getDuration()),owner);
         subscription.setOwner(owner);
         subscriptionRepository.save(subscription);
     }
 
-    public void updateSubscription( int id , Subscription subscription) {
-        Subscription oldSubscription = subscriptionRepository.findSubscriptionById(id);
+    public void updateSubscription( Integer adminId , Integer subscriptionId , Subscription subscription) {
+        User adminUser = userRepository.findUserById(adminId);
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            throw new ApiException("Only admins can activate users");
+        }
+        Subscription oldSubscription = subscriptionRepository.findSubscriptionById(subscriptionId);
         if(oldSubscription == null) {
             throw new ApiException("subscription not found");
         }
         oldSubscription.setDuration(subscription.getDuration());
-        // oldSubscription.setStartDate(subscription.getStartDate());
-        oldSubscription.setType(subscription.getType());
-        // oldSubscription.setEndDate(subscription.getEndDate());
+         oldSubscription.setStartDate(subscription.getStartDate());
+         oldSubscription.setEndDate(subscription.getEndDate());
         subscriptionRepository.save(oldSubscription);
     }
 
-    public void deleteSubscription( int id ) {
-        Subscription subscription = subscriptionRepository.findSubscriptionById(id);
+    public void deleteSubscription( Integer adminId , Integer subscriptionId ) {
+        User adminUser = userRepository.findUserById(adminId);
+        if (adminUser == null || !"ADMIN".equals(adminUser.getRole())) {
+            throw new ApiException("Only admins can activate users");
+        }
+        Subscription subscription = subscriptionRepository.findSubscriptionById(subscriptionId);
         if(subscription == null) {
             throw new ApiException("subscription not found");
         }

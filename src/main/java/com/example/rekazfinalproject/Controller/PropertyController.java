@@ -1,35 +1,50 @@
 package com.example.rekazfinalproject.Controller;
 import com.example.rekazfinalproject.DTO.PropertyDTO;
+import com.example.rekazfinalproject.Model.User;
 import com.example.rekazfinalproject.Service.PropertyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/property")
 @RequiredArgsConstructor
 public class PropertyController {
+
+
     private final PropertyService propertyService;
-    @GetMapping("/get")
+
+
+    @GetMapping("/get-all-properties")
     public ResponseEntity getAllProperty(){
+
+
         return ResponseEntity.status(200).body(propertyService.getAllProperty());
+
+
     }
 
-    @PostMapping("/add")
-    public ResponseEntity addProperty(@Valid @RequestBody PropertyDTO propertyDTO) {
-        propertyService.addProperty(propertyDTO);
+
+    @GetMapping("/get-my-properties")
+    public ResponseEntity getMyProperty(@AuthenticationPrincipal User user){
+        return ResponseEntity.status(200).body(propertyService.getMyProperty(user.getId()));
+    }
+    @PostMapping("/add-property")
+    public ResponseEntity addProperty(@AuthenticationPrincipal User user, @Valid @RequestBody PropertyDTO propertyDTO) {
+        propertyService.addProperty(user.getId(),propertyDTO);
         return ResponseEntity.status(200).body("Property add successfully");
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity updateProperty(@PathVariable Integer id, @Valid @RequestBody PropertyDTO propertyDTO) {
-        propertyService.updateProperty(id, propertyDTO);
+    @PutMapping("/update-property/{propertyId}")
+    public ResponseEntity updateProperty(@AuthenticationPrincipal User user,@PathVariable Integer propertyId, @Valid @RequestBody PropertyDTO propertyDTO) {
+        propertyService.updateProperty(user.getId(),propertyId, propertyDTO);
         return ResponseEntity.status(200).body("Property updated successfully");
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteProperty(@PathVariable Integer id) {
-        propertyService.deleteProperty(id);
+    @DeleteMapping("/delete/{propertyId}")
+    public ResponseEntity deleteProperty(@AuthenticationPrincipal User user,@PathVariable Integer propertyId) {
+        propertyService.deleteProperty(user.getId(),propertyId);
         return ResponseEntity.status(200).body("Property deleted successfully");
     }
 

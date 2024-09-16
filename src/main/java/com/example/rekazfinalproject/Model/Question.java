@@ -28,11 +28,9 @@ public class Question {
 
     @ManyToOne
     @JsonIgnore
-    private Investor investor;
+    private User user ;
 
-    @ManyToOne
-    @JsonIgnore
-    private Owner owner;
+
 
 
 }

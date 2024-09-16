@@ -1,10 +1,12 @@
 package com.example.rekazfinalproject.Controller;
 
 import com.example.rekazfinalproject.Model.Question;
+import com.example.rekazfinalproject.Model.User;
 import com.example.rekazfinalproject.Service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,18 +22,25 @@ public class QuestionController {
         return ResponseEntity.status(200).body(questionService.getAllQuestion());
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity updateQuestion(@PathVariable Integer id, @Valid @RequestBody Question question)
-    {
-        questionService.updateQuestion(id, question);
-        return ResponseEntity.status(200).body("Question updated");
+    @PostMapping("/add-question")
+    public ResponseEntity addQuestion(@AuthenticationPrincipal User user , @RequestBody String question) {
+        questionService.addQuestion(user.getId(),question);
+        return ResponseEntity.status(200).body("Question added successfully");
     }
 
-     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteQuestion(@PathVariable Integer id)
+
+    @PutMapping("/update-question/{questionId}")
+    public ResponseEntity updateQuestion(@PathVariable Integer questionId, @Valid @RequestBody Question question)
     {
-        questionService.deleteQuestion(id);
-        return ResponseEntity.status(200).body("Question deleted");
+        questionService.updateQuestion(questionId, question);
+        return ResponseEntity.status(200).body("Question updated Successfully");
+    }
+
+     @DeleteMapping("/delete-question/{questionId}")
+    public ResponseEntity deleteQuestion(@PathVariable Integer questionId)
+    {
+        questionService.deleteQuestion(questionId);
+        return ResponseEntity.status(200).body("Question deleted Successfully");
     }
 
 

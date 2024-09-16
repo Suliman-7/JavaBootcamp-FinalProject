@@ -1,8 +1,8 @@
 package com.example.rekazfinalproject.Service;
 
 import com.example.rekazfinalproject.Api.ApiException;
-import com.example.rekazfinalproject.Model.Complaint;
-import com.example.rekazfinalproject.Repository.ComplaintRepository;
+import com.example.rekazfinalproject.Model.*;
+import com.example.rekazfinalproject.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +11,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ComplaintService {
-private final ComplaintRepository complaintRepository;
+    private final ComplaintRepository complaintRepository;
     private final InvestorRepository investorRepository;
     private final OwnerRepository ownerRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    //Admin
     public List<Complaint> getAllComplaint() {
         return complaintRepository.findAll();
     }
@@ -36,15 +37,15 @@ private final ComplaintRepository complaintRepository;
         complaintRepository.save(complaint);
     }
     //Shahad
-         //Owner send complaint
-        public void ownerSendComplaint(Integer ownerId,Complaint complaint) {
+    //Owner send complaint
+    public void ownerSendComplaint(Integer ownerId,Complaint complaint) {
         Owner owner=ownerRepository.findOwnerById(ownerId);
         if(owner==null){
             throw new ApiException("Owner not found");
         }
-            Project project=projectRepository.findProjectByOwnerId(ownerId);
+        Project project=projectRepository.findProjectByOwnerId(ownerId);
         if(!project.getId().equals(complaint.getProject_num())){
-           throw new ApiException("You have no right to complain.");
+            throw new ApiException("You have no right to complain.");
         }
         complaint.setOwner(owner);
         complaint.setInvestor(project.getInvestor());
@@ -52,10 +53,15 @@ private final ComplaintRepository complaintRepository;
         complaintRepository.save(complaint);
     }
     //Shahad
-    public void updateComplaint(Integer id,Complaint complaint) {
-        Complaint complaint1 = complaintRepository.findComplaintsById(id);
+    //admin
+    public void updateComplaint(Integer adminId,Integer compId,Complaint complaint) {
+        Complaint complaint1 = complaintRepository.findComplaintsById(compId);
         if (complaint1 == null) {
             throw new ApiException("Complaint not found");
+        }
+        User adminUser=userRepository.findUserById(adminId);
+        if(adminUser==null||!adminUser.getRole().equalsIgnoreCase("ADMIN")){
+            throw new ApiException("You do not have the authority");
         }
         complaint1.setDescription(complaint.getDescription());
         complaint1.setFile(complaint.getFile());
@@ -67,9 +73,12 @@ private final ComplaintRepository complaintRepository;
 
     //Shahad
     //admin deleted
-    public void deleteComplaint(Integer id) {
-        Complaint complaint1 = complaintRepository.findComplaintsById(id);
-
+    public void deleteComplaint(Integer adminId,Integer comId) {
+        Complaint complaint1 = complaintRepository.findComplaintsById(comId);
+        User adminUser=userRepository.findUserById(adminId);
+        if(adminUser==null||!adminUser.getRole().equalsIgnoreCase("ADMIN")){
+            throw new ApiException("You do not have the authority");
+        }
         if (complaint1 == null) {
             throw new ApiException("Complaint not found");
         }

@@ -1,19 +1,19 @@
 package com.example.rekazfinalproject.Service;
 
 import com.example.rekazfinalproject.Api.ApiException;
-import com.example.rekazfinalproject.Model.Consultation;
-import com.example.rekazfinalproject.Model.User;
-import com.example.rekazfinalproject.Repository.ConsultationRepository;
-import com.example.rekazfinalproject.Repository.ProjectRepository;
+import com.example.rekazfinalproject.Model.*;
+import com.example.rekazfinalproject.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ConsultationService {
-   private final ConsultationRepository consultationRepository;
+    private final ConsultationRepository consultationRepository;
     public final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final AvailableDateRepository availableDateRepository;
@@ -22,14 +22,14 @@ public class ConsultationService {
 
     //shahad
     //all consultation must be admin
-    public List<Consultation> getAllConsultations(Integer user) {
-        User user1 = userRepository.findUserById(user);
-        if (user1 == null) {
-            throw new ApiException("Owner not found");
-        }
+    public List<Consultation> getAllConsultations() {
         return consultationRepository.findAll();
     }
 
+    public List<Consultation> getMyConsultation(Integer investorId) {
+        Investor investor=investorRepository.findInvestorById(investorId);
+         return consultationRepository.findAllByInvestor(investor);
+    }
     //shahad
     public void bookConsultation(Integer ownerId, Integer investorId, Consultation consultation) {
         // Find the owner and check his role
@@ -71,23 +71,29 @@ public class ConsultationService {
 
 
     //shahad
-    public void updateConsultation(Integer id, Consultation consultation) {
-        Consultation consultation1 = consultationRepository.findConsultationById(id);
-
+    public void updateConsultation(Integer userid,Integer consultId, Consultation consultation) {
+        User user=userRepository.findUserById(userid);
+        Consultation consultation1 = consultationRepository.findConsultationById(consultId);
+        if(user==null){
+            throw new ApiException("User not found");
+        }
         if (consultation1 == null) {
             throw new ApiException("Consultation not found");
         }
-
         consultation1.setConsultationDate(consultation.getConsultationDate());
         consultation1.setDuration(consultation.getDuration());
         consultationRepository.save(consultation1);
     }
 
     //shahad
-    public void deleteConsultation(Integer id) {
+    public void deleteConsultation(Integer adminId,Integer id) {
         Consultation consultation1 = consultationRepository.findConsultationById(id);
         if (consultation1 == null) {
             throw new ApiException("Consultation not found");
+        }
+        User adminUser=userRepository.findUserById(adminId);
+        if(adminUser==null||!adminUser.getRole().equalsIgnoreCase("ADMIN")){
+            throw new ApiException("You do not have the authority");
         }
         consultationRepository.delete(consultation1);
     }
@@ -182,7 +188,7 @@ public class ConsultationService {
         consultationRepository.save(consultation);
     }
     //shahad
-   //get available consultation
+    //get available consultation
     public List<AvailableDate> getAvailableConsultationDatesForInvestor(Integer ownerId,Integer investorId) {
         Owner owner=ownerRepository.findOwnerById(ownerId);
         if(owner==null){

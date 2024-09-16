@@ -3,6 +3,7 @@ package com.example.rekazfinalproject.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,13 +28,17 @@ public class AvailableDate {
 
     @Column(columnDefinition = "datetime not null")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-     @FutureOrPresent
+    @FutureOrPresent
     private LocalDateTime date ;
 
     @Column(columnDefinition = "boolean")
-    private boolean booked = false ;
+    private Boolean booked = false ;
+
+
 
     @ManyToOne
     @JsonIgnore
     private Investor investor;
+
+
 }
